@@ -214,7 +214,7 @@ class HMC6343(object):
                 roll = (-(self.MAX_16_BIT+1) + roll)
             roll = roll/10.0
 
-            print("Heading = %f" %heading)
+            #print("Heading = %f" %heading)
             return heading
 
     def readTilt(self):
@@ -239,9 +239,9 @@ class HMC6343(object):
                 temp = (-(self.MAX_16_BIT+1) + temp)
             temp = temp/10.0    
 
-            print("Pitch = %f" %pitch)
-            print("Roll = %f" %roll)
-            print("Temperature = %f" %temp)
+            #print("Pitch = %f" %pitch)
+            #print("Roll = %f" %roll)
+            #print("Temperature = %f" %temp)
 
     def readTemp(self):
         sleep(self.TD_DEFAULT)
@@ -255,9 +255,9 @@ class HMC6343(object):
                 temp = (-(self.MAX_16_BIT+1) + temp)
             temp = temp/10.0    
 
-            print("Pitch = %f" %pitch)
-            print("Roll = %f" %roll)
-            print("Temperature = %f" %temp)
+            #print("Pitch = %f" %pitch)
+            #print("Roll = %f" %roll)
+            #print("Temperature = %f" %temp)
 
     def readOPMode1(self):
         sleep(self.TD_DEFAULT)
@@ -266,7 +266,7 @@ class HMC6343(object):
             sleep(self.TD_POST_DATA)
             readValues = bus.transaction(i2c.reading(self.I2C_ADDR, self.BLEN_EEPROM_REG))
 
-            print("Value of OpMode1= 0x%02x" %readValues[0][0])
+            #print("Value of OpMode1= 0x%02x" %readValues[0][0])
             return readValues[0][0]
 
     def setOrientation(self, orientation):
@@ -407,6 +407,6 @@ if __name__ == '__main__':
 
     compass = HMC6343()
     while True:
-        compass.readHeading()
-        sleep(0.1)
+        print(compass.readHeading())
+        sleep(0.10)
 
