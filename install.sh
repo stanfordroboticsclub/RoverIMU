@@ -7,8 +7,8 @@ yes | sudo pip3 install quick2wire-api
 sudo apt-get install -y i2c-tools
 
 # untessted!
-. raspi-config nonint
-do_i2c 0
+# . raspi-config nonint
+# do_i2c 0
 
 for file in *.service; do
     [ -f "$file" ] || break

@@ -1,0 +1,11 @@
+[Unit]
+Description=Pub: 8280 - heading angle from magnetometer
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/RoverIMU/compass.py
+StandardOutput=syslog
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
