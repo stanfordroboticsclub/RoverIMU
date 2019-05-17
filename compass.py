@@ -26,12 +26,12 @@ class ComplementaryFilter:
     def update_gyro(self,omega):
         # omega is in deg/s
         if self.lastGyroTime == None:
-            self.lastGyroTime = time.time()
+            self.lastGyroTime = time()
             return
 
         omega_rad = math.radians(omega)
-        delta_t = time.time() - self.lastGyroTime
-        self.lastGyroTime = time.time()
+        delta_t = time() - self.lastGyroTime
+        self.lastGyroTime = time()
 
         rad = math.atan2(self.lastSin, self.lastCos) + omega_rad * delta_t
         self.lastSin = math.sin(rad)
@@ -51,16 +51,27 @@ imu = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
 compass = HMC6343()
 
 # initialize filter
-filt = ComplementaryFilter(0.7)
+# TODO find good value
+filt = ComplementaryFilter(0.8)
+
+lastGyro = 0
+lastMag = 0
+lastPub = 0
 
 while True:
-    heading = compass.readHeading()
-    filt.update_mag(heading)
+    if time() - lastMag > 0.10:
+        heading = compass.readHeading()
+        filt.update_mag(heading)
+        lastMag = time()
 
-    gyro_x, gyro_y, gyro_z = imu.gyro
-    filt.update_gyro(-gyro_z)
+    if time() - lastGyro > 0.01:
+        gyro_x, gyro_y, gyro_z = imu.gyro
+        filt.update_gyro(-gyro_z)
+        lastGyro = time()
 
-    angle = filt.get_angle()
-    print(angle)
-    pub.send({'angle':[angle, None, None]})
-    sleep(0.08)
+    if time() - lastPub > 0.05:
+        angle = filt.get_angle()
+        print(angle, heading)
+        pub.send({'angle':[angle, None, None]})
+        lastPub = time()
+
