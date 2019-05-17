@@ -5,6 +5,7 @@ cd $FOLDER
 
 yes | sudo pip3 install quick2wire-api
 sudo apt-get install -y i2c-tools
+yes | sudo pip3 install adafruit-circuitpython-lsm9ds1
 
 # untessted!
 # . raspi-config nonint
