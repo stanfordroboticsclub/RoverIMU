@@ -6,6 +6,8 @@ import math
 
 from HMC6343 import HMC6343
 
+offset = 10
+
 import board
 import busio
 import adafruit_lsm9ds1
@@ -16,6 +18,8 @@ class ComplementaryFilter:
         self.lastSin = math.sin(0)
         self.lastCos = math.cos(0)
         self.lastGyroTime = None
+        self.lastGyro = 0
+        
 
     def update_mag(self,heading):
         # heading is in degrees
@@ -37,6 +41,8 @@ class ComplementaryFilter:
         self.lastSin = math.sin(rad)
         self.lastCos = math.cos(rad)
 
+        self.lastGyro = (self.lastGyro + omega * delta_t) % 360
+
     def get_angle(self):
         rad = math.atan2(self.lastSin, self.lastCos)
         return math.degrees(rad) % 360
@@ -52,7 +58,7 @@ compass = HMC6343()
 
 # initialize filter
 # TODO find good value
-filt = ComplementaryFilter(0.8)
+filt = ComplementaryFilter(0.99)
 
 lastGyro = 0
 lastMag = 0
@@ -70,8 +76,8 @@ while True:
         lastGyro = time()
 
     if time() - lastPub > 0.05:
-        angle = filt.get_angle()
-        print(angle, heading)
-        pub.send({'angle':[angle, None, None]})
+        angle = filt.get_angle() + offset
+        print(angle, heading, filt.lastGyro)
+        pub.send({'angle':[angle, None, None],'mag':heading+offset})
         lastPub = time()
 
