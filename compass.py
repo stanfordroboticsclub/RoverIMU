@@ -6,6 +6,7 @@ import math
 
 from HMC6343 import HMC6343
 
+#TODO dynamic offset update
 offset = 10
 
 import board
@@ -15,22 +16,28 @@ import adafruit_lsm9ds1
 class ComplementaryFilter:
     def __init__(self, K):
         self.K = K
-        self.lastSin = math.sin(0)
-        self.lastCos = math.cos(0)
+        self.lastSin = None
+        self.lastCos = None
         self.lastGyroTime = None
         self.lastGyro = 0
-        
 
     def update_mag(self,heading):
         # heading is in degrees
         rad = math.radians(heading)
-        self.lastSin = self.K * self.lastSin + (1-self.K) * math.sin(rad)
-        self.lastCos = self.K * self.lastCos + (1-self.K) * math.cos(rad)
+
+        if self.lastSin == None or self.lastSin == None:
+            self.lastSin = math.sin(rad)
+            self.lastCos = math.cos(rad)
+        else:
+            self.lastSin = self.K * self.lastSin + (1-self.K) * math.sin(rad)
+            self.lastCos = self.K * self.lastCos + (1-self.K) * math.cos(rad)
 
     def update_gyro(self,omega):
         # omega is in deg/s
         if self.lastGyroTime == None:
             self.lastGyroTime = time()
+            return
+        if self.lastSin == None or self.lastSin == None:
             return
 
         omega_rad = math.radians(omega)
