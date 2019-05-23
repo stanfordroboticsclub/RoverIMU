@@ -1,13 +1,11 @@
 
-from UDPComms import Publisher
+from UDPComms import Publisher, Subscriber, timeout
 
 from time import sleep, time
 import math
 
 from HMC6343 import HMC6343
 
-#TODO dynamic offset update
-offset = 10
 
 import board
 import busio
@@ -55,6 +53,9 @@ class ComplementaryFilter:
         return math.degrees(rad) % 360
 
 pub = Publisher(8220)
+
+offset = 10 #random starting value mostly correct aroudn stanford
+offset_sub = Subscriber(8210, timeout=5)
  
 # I2C connection to IMU
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -83,6 +84,10 @@ while True:
         lastGyro = time()
 
     if time() - lastPub > 0.05:
+        try:
+            offset = float(offset_sub.get())
+        except:
+            pass
         angle = filt.get_angle() + offset
         print(angle, heading, filt.lastGyro)
         pub.send({'angle':[angle, None, None],'mag':heading+offset})
